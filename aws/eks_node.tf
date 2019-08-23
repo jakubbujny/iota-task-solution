@@ -53,6 +53,27 @@ resource "aws_iam_role_policy" "s3-backup" {
 POLICY
 }
 
+resource "aws_iam_role_policy" "s3-layers" {
+  name = "iota-solution-s3-layers-access"
+  role = "${aws_iam_role.eks-node.name}"
+
+  policy = <<POLICY
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": "s3:*",
+     "Resource": [
+      "${aws_s3_bucket.layers.arn}",
+      "${aws_s3_bucket.layers.arn}/*"
+     ]
+   }
+ ]
+}
+POLICY
+}
+
 resource "aws_iam_instance_profile" "eks-node" {
   name = "eks-node"
   role = "${aws_iam_role.eks-node.name}"
