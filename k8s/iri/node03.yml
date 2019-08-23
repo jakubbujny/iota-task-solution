@@ -9,7 +9,11 @@ metadata:
 spec:
   ports:
     - port: 14265
-      name: iri
+      name: iri-api
+    - port: 14600
+      name: iri-peering-udp
+    - port: 15600
+      name: iri-peering-tcp
   clusterIP: None
   selector:
     app: iri-03
@@ -31,6 +35,18 @@ spec:
         app: iri-03
     spec:
       containers:
+        - name: backup
+          image: digitalrasta/backup:aws-10
+          env:
+          - name: MY_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: dockersock
+              mountPath: "/var/run/docker.sock"
         - name: iri
           image: iotaledger/iri:latest
           args:
@@ -46,19 +62,26 @@ spec:
             - --max-depth 1000
           ports:
             - containerPort: 14265
-              name: iri
+              name: iri-api
+            - containerPort: 15600
+              name: iri-peering-tcp
+            - containerPort: 14600
+              name: iri-peering-udp
           volumeMounts:
             - name: data
               mountPath: /iri/data
             - name: snapshot
               mountPath: /snapshot.txt
               subPath: snapshot.txt
-      nodeSelector:
-        failure-domain.beta.kubernetes.io/zone: eu-west-1c
+#      nodeSelector:
+#        failure-domain.beta.kubernetes.io/zone: eu-west-1c
       volumes:
         - name: snapshot
           configMap:
             name: snapshot
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
   volumeClaimTemplates:
     - metadata:
         name: data
