@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: compass
-          image: digitalrasta/compass:aws-07
+          image: digitalrasta/compass:aws-11
           ports:
             - containerPort: 14265
               name: iri
