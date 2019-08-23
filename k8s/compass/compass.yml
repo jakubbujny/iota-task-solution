@@ -1,0 +1,52 @@
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: compass
+  labels:
+    app: compass
+spec:
+  ports:
+    - port: 14265
+      name: iri
+  clusterIP: None
+  selector:
+    app: compass
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: compass
+spec:
+  serviceName: "compass"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: compass
+  template:
+    metadata:
+      labels:
+        app: compass
+    spec:
+      containers:
+        - name: compass
+          image: digitalrasta/compass:aws-03
+          ports:
+            - containerPort: 14265
+              name: iri
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      nodeSelector:
+        failure-domain.beta.kubernetes.io/zone: eu-west-1b
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 5Gi
+
