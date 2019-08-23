@@ -13,8 +13,8 @@ data:
         - system:bootstrappers
         - system:nodes
   mapUsers: |
-  - userarn: arn:aws:iam::172806112519:user/jbujny
-    username: jbujny
-    groups:
-      - system:masters
+    - userarn: arn:aws:iam::172806112519:user/jbujny
+      username: jbujny
+      groups:
+        - system:masters
 

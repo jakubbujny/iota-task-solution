@@ -32,10 +32,10 @@ resource "aws_iam_role_policy_attachment" "eks-node-AmazonEC2ContainerRegistryRe
   role       = "${aws_iam_role.eks-node.name}"
 }
 
-
 resource "aws_iam_role_policy" "s3-backup" {
   name = "iota-solution-s3-backup-access"
   role = "${aws_iam_role.eks-node.name}"
+
   policy = <<POLICY
 {
  "Version": "2012-10-17",
@@ -61,11 +61,13 @@ resource "aws_iam_instance_profile" "eks-node" {
 data "aws_ami" "eks-worker" {
   filter {
     name   = "name"
-    values = ["amazon-eks-node-v*"]
+    values = ["amazon-eks-node-1.13-v*"]
   }
 
   most_recent = true
-  owners      = ["602401143452"] # Amazon Account ID
+
+  # Owner ID of AWS EKS team
+  owners = ["602401143452"]
 }
 
 locals {
@@ -76,6 +78,10 @@ set -o xtrace
 USERDATA
 }
 
+resource "aws_key_pair" "jbujny" {
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6Wehner9f9SsMRf5hVXEcZSV4bY0ry4797QEaoLuJxILsFGdwGX81xLTfppSmIrwzIw2VaSR02IDBEb6gApmIHWZREy4NkQxtyJdEVkYGCVCLaA+S5+mOYfiMR/4M96MWwiMb65ZS2Hx67Zqt+l9MZ90+PH41epwvtJTqSOKGwhQNRXHdAfotpZgojzvBYWp44OytChlntvtRTBPe22Be+KGTIrRzC4q9qMZhxtIWtJyuLWsrowvRMK7Xst8A5tnkxs/QXXCs5DcxHHvrHwhKQ0afdajo8L/vdItL9iDM1E8XRiUSyjajvKYsJfjnFQyqIh+zOdnWC2ewKqEQN5xJ jbujny@jbujny-Precision-3520"
+}
+
 resource "aws_launch_configuration" "node" {
   associate_public_ip_address = true
   iam_instance_profile        = "${aws_iam_instance_profile.eks-node.name}"
@@ -84,16 +90,22 @@ resource "aws_launch_configuration" "node" {
   name_prefix                 = "terraform-eks"
   security_groups             = ["${aws_security_group.eks-node.id}"]
   user_data_base64            = "${base64encode(local.eks-node-userdata)}"
+  key_name                    = "${aws_key_pair.jbujny.key_name}"
 
   root_block_device {
     delete_on_termination = true
-    volume_size = 20
-    volume_type = "gp2"
+    volume_size           = 40
+    volume_type           = "gp2"
   }
 
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_placement_group" "placement" {
+  name     = "eks-spread"
+  strategy = "spread"
 }
 
 resource "aws_autoscaling_group" "node" {
@@ -102,7 +114,8 @@ resource "aws_autoscaling_group" "node" {
   max_size             = 1
   min_size             = 1
   name                 = "eks"
-  vpc_zone_identifier  = ["${aws_subnet.eks_a.id}"]
+  vpc_zone_identifier  = ["${aws_subnet.eks_a.id}", "${aws_subnet.eks_b.id}", "${aws_subnet.eks_c.id}"]
+  placement_group      = "${aws_placement_group.placement.name}"
 
   tag {
     key                 = "Name"
@@ -134,10 +147,10 @@ data:
         - system:bootstrappers
         - system:nodes
   mapUsers: |
-  - userarn: arn:aws:iam::172806112519:user/jbujny
-    username: jbujny
-    groups:
-      - system:masters
+    - userarn: arn:aws:iam::172806112519:user/jbujny
+      username: jbujny
+      groups:
+        - system:masters
 CONFIGMAPAWSAUTH
 }
 
