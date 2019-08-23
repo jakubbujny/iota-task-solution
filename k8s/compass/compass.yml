@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: compass
-          image: digitalrasta/compass:aws-03
+          image: digitalrasta/compass:aws-07
           ports:
             - containerPort: 14265
               name: iri
@@ -40,7 +40,7 @@ spec:
             - name: data
               mountPath: /data
       nodeSelector:
-        failure-domain.beta.kubernetes.io/zone: eu-west-1b
+        failure-domain.beta.kubernetes.io/zone: eu-west-1c
   volumeClaimTemplates:
     - metadata:
         name: data

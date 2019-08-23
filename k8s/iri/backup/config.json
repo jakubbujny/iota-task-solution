@@ -1,0 +1,4 @@
+[{
+  "schedule":"@every 2m",
+  "command":"/run.sh"
+}]

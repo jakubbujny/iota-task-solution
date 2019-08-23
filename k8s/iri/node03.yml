@@ -54,7 +54,7 @@ spec:
               mountPath: /snapshot.txt
               subPath: snapshot.txt
       nodeSelector:
-        failure-domain.beta.kubernetes.io/zone: eu-west-1b
+        failure-domain.beta.kubernetes.io/zone: eu-west-1c
       volumes:
         - name: snapshot
           configMap:
