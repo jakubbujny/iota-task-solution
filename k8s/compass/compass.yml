@@ -39,8 +39,8 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-      nodeSelector:
-        failure-domain.beta.kubernetes.io/zone: eu-west-1c
+#      nodeSelector:
+#        failure-domain.beta.kubernetes.io/zone: eu-west-1c
   volumeClaimTemplates:
     - metadata:
         name: data
