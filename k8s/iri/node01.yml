@@ -1,0 +1,68 @@
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: iri-01
+  labels:
+    app: iri-01
+spec:
+  ports:
+    - port: 14265
+      name: iri
+  clusterIP: None
+  selector:
+    app: iri-01
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: iri-01
+spec:
+  serviceName: "iri-01"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iri-01
+  template:
+    metadata:
+      labels:
+        app: iri-01
+    spec:
+      containers:
+        - name: iri
+          image: iotaledger/iri:latest
+          args:
+            - --testnet true
+            - --remote true
+            - --testnet-coordinator KXHHRQEV9BDQMTFOMUBUDYVIR9VQONVSXHTOWVTQJPHOR99WOZUPMMG9EIAXGGWLUNTSYHVILCIKDRDOP
+            - --testnet-coordinator-security-level 1
+            - --testnet-coordinator-signature-mode CURLP27
+            - --mwm 7
+            - --milestone-start 0
+            - --milestone-keys 13
+            - --snapshot /snapshot.txt
+            - --max-depth 1000
+          ports:
+            - containerPort: 14265
+              name: iri
+          volumeMounts:
+            - name: data
+              mountPath: /iri/data
+            - name: snapshot
+              mountPath: /snapshot.txt
+              subPath: snapshot.txt
+      volumes:
+        - name: snapshot
+          configMap:
+            name: snapshot
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 5Gi
+
