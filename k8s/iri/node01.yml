@@ -3,9 +3,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: iri-03
+  name: iri-01
   labels:
-    app: iri-03
+    app: iri-01
 spec:
   ports:
     - port: 14265
@@ -16,23 +16,23 @@ spec:
       name: iri-peering-tcp
   clusterIP: None
   selector:
-    app: iri-03
+    app: iri-01
 
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: iri-03
+  name: iri-01
 spec:
-  serviceName: "iri-03"
+  serviceName: "iri-01"
   replicas: 1
   selector:
     matchLabels:
-      app: iri-03
+      app: iri-01
   template:
     metadata:
       labels:
-        app: iri-03
+        app: iri-01
     spec:
       containers:
         - name: backup

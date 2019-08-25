@@ -3,9 +3,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: iri-03
+  name: iri-02
   labels:
-    app: iri-03
+    app: iri-02
 spec:
   ports:
     - port: 14265
@@ -16,23 +16,23 @@ spec:
       name: iri-peering-tcp
   clusterIP: None
   selector:
-    app: iri-03
+    app: iri-02
 
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: iri-03
+  name: iri-02
 spec:
-  serviceName: "iri-03"
+  serviceName: "iri-02"
   replicas: 1
   selector:
     matchLabels:
-      app: iri-03
+      app: iri-02
   template:
     metadata:
       labels:
-        app: iri-03
+        app: iri-02
     spec:
       containers:
         - name: backup
@@ -49,7 +49,7 @@ spec:
               mountPath: "/var/run/docker.sock"
         - name: iri
           image: iotaledger/iri:latest
-          args: ["-n", "tcp://iri-02:15600","--testnet", "true", "--remote", "true", "--testnet-coordinator", "9LFYANWKXIKHKYETYBZQPI9SSBZA9KJCOKLMPFUXNWUTULJVOAKHPWVYIVKDCXUYPLFBBHHUFHOESJWNZ", "--testnet-coordinator-security-level", "1", "--testnet-coordinator-signature-mode", "CURLP27", "--mwm", "7", "--milestone-start", "0", "--milestone-keys", "13", "--snapshot", "/snapshot.txt", "--max-depth", "1000"]
+          args: ["-n", "tcp://iri-03:15600,tcp://iri-01:15600","--testnet", "true", "--remote", "true", "--testnet-coordinator", "9LFYANWKXIKHKYETYBZQPI9SSBZA9KJCOKLMPFUXNWUTULJVOAKHPWVYIVKDCXUYPLFBBHHUFHOESJWNZ", "--testnet-coordinator-security-level", "1", "--testnet-coordinator-signature-mode", "CURLP27", "--mwm", "7", "--milestone-start", "0", "--milestone-keys", "13", "--snapshot", "/snapshot.txt", "--max-depth", "1000"]
           ports:
             - containerPort: 14265
               name: iri-api
