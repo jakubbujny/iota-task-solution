@@ -29,10 +29,12 @@ spec:
   selector:
     matchLabels:
       app: iri-01
+      type: iri
   template:
     metadata:
       labels:
         app: iri-01
+        type: iri
     spec:
       containers:
         - name: backup
@@ -75,8 +77,8 @@ spec:
             - name: snapshot
               mountPath: /snapshot.txt
               subPath: snapshot.txt
-#      nodeSelector:
-#        failure-domain.beta.kubernetes.io/zone: eu-west-1c
+      nodeSelector:
+        failure-domain.beta.kubernetes.io/zone: eu-west-1a
       volumes:
         - name: snapshot
           configMap:

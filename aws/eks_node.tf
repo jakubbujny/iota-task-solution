@@ -107,7 +107,7 @@ resource "aws_launch_configuration" "node" {
   associate_public_ip_address = true
   iam_instance_profile        = "${aws_iam_instance_profile.eks-node.name}"
   image_id                    = "${data.aws_ami.eks-worker.id}"
-  instance_type               = "t2.medium"
+  instance_type               = "t3.xlarge"
   name_prefix                 = "terraform-eks"
   security_groups             = ["${aws_security_group.eks-node.id}"]
   user_data_base64            = "${base64encode(local.eks-node-userdata)}"
@@ -130,10 +130,10 @@ resource "aws_placement_group" "placement" {
 }
 
 resource "aws_autoscaling_group" "node" {
-  desired_capacity     = 1
+  desired_capacity     = 3
   launch_configuration = "${aws_launch_configuration.node.id}"
-  max_size             = 1
-  min_size             = 1
+  max_size             = 3
+  min_size             = 3
   name                 = "eks"
   vpc_zone_identifier  = ["${aws_subnet.eks_a.id}", "${aws_subnet.eks_b.id}", "${aws_subnet.eks_c.id}"]
   placement_group      = "${aws_placement_group.placement.name}"

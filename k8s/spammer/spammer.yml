@@ -1,0 +1,46 @@
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spammer-entrypoint
+data:
+  entrypoint.sh: |
+    apt-get update
+    apt-get install -y wget
+    wget https://github.com/iota-tangle-io/iota-spammer/releases/download/alpha1/spammer-alpha1-linux-amd64
+    chmod +x spammer-alpha1-linux-amd64
+    ./spammer-alpha1-linux-amd64 --node=http://iri-03:14265
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spammer
+spec:
+  replicas: 20
+  selector:
+    matchLabels:
+      app: spammer
+  template:
+    metadata:
+      labels:
+        app: spammer
+    spec:
+      containers:
+        - name: spammer
+          image: ubuntu:18.04
+          command: ["bash"]
+          args: ["/entrypoint.sh"]
+          volumeMounts:
+            - name: entrypoint
+              mountPath: /entrypoint.sh
+              subPath: entrypoint.sh
+#      nodeSelector:
+#        failure-domain.beta.kubernetes.io/zone: eu-west-1c
+      volumes:
+        - name: entrypoint
+          configMap:
+            name: spammer-entrypoint
+

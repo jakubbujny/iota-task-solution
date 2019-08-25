@@ -66,8 +66,8 @@ spec:
             - name: entrypoint
               mountPath: /entrypoint.sh
               subPath: entrypoint.sh
-#      nodeSelector:
-#        failure-domain.beta.kubernetes.io/zone: eu-west-1c
+      nodeSelector:
+        failure-domain.beta.kubernetes.io/zone: eu-west-1c
       volumes:
         - name: entrypoint
           configMap:
