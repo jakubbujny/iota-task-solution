@@ -7,9 +7,6 @@ metadata:
   labels:
     app: compass
 spec:
-  ports:
-    - port: 14265
-      name: iri
   clusterIP: None
   selector:
     app: compass
@@ -32,10 +29,9 @@ spec:
     spec:
       containers:
         - name: compass
-          image: digitalrasta/compass:aws-11
-          ports:
-            - containerPort: 14265
-              name: iri
+          image: digitalrasta/compass:aws-17
+          command: ["/entrypoint.sh"]
+          args: ["-layers", "/layers", "-statePath", "/data/compass.state", "-sigMode", "CURLP27", "-powMode", "CURLP81", "-mwm", "7","-security", "1" ,"-seed" ,"SEED99999999999999999999999999999999999999999999999999999999999999999999999999999", "-tick", "90000" ,"-host" ,"http://iri-03:14265","-broadcast"]
           volumeMounts:
             - name: data
               mountPath: /data

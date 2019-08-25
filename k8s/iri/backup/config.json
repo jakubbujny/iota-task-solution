@@ -1,4 +1,4 @@
 [{
-  "schedule":"@every 24h",
+  "schedule":"@daily",
   "command":"/run.sh"
 }]
