@@ -47,6 +47,18 @@ spec:
           image: node:8.16.1-jessie
           command: ["bash"]
           args: ["/entrypoint.sh"]
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 4
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            failureThreshold: 4
           ports:
             - containerPort: 80
               name: web

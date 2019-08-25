@@ -50,6 +50,18 @@ spec:
         - name: iri
           image: iotaledger/iri:latest
           args: ["-n", "tcp://iri-02:15600","--testnet", "true", "--remote", "true", "--testnet-coordinator", "9LFYANWKXIKHKYETYBZQPI9SSBZA9KJCOKLMPFUXNWUTULJVOAKHPWVYIVKDCXUYPLFBBHHUFHOESJWNZ", "--testnet-coordinator-security-level", "1", "--testnet-coordinator-signature-mode", "CURLP27", "--mwm", "7", "--milestone-start", "0", "--milestone-keys", "13", "--snapshot", "/snapshot.txt", "--max-depth", "1000"]
+          readinessProbe:
+            tcpSocket:
+              port: 14265
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 4
+          livenessProbe:
+            tcpSocket:
+              port: 14265
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            failureThreshold: 4
           ports:
             - containerPort: 14265
               name: iri-api
