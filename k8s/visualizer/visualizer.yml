@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: visualizer
+spec:
+  selector:
+    app: visualizer
+  ports:
+    - port: 80
+      targetPort: web
+  type: LoadBalancer
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: visualizer-entrypoint
+data:
+  entrypoint.sh: |
+    git clone https://github.com/glumb/IOTAtangle.git
+    cd IOTAtangle
+    npm install
+    sed -i "s~https://<CHANGEME>:443~http://iri-03:14265~" mainnetApp.js
+    sed -i "s~<CHANGEME>~iri-03~" mainnetApp.js
+    node mainnetApp.js
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: visualizer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: visualizer
+  template:
+    metadata:
+      labels:
+        app: visualizer
+    spec:
+      containers:
+        - name: visualizer
+          image: node:8.16.1-jessie
+          command: ["bash"]
+          args: ["/entrypoint.sh"]
+          ports:
+            - containerPort: 80
+              name: web
+          volumeMounts:
+            - name: entrypoint
+              mountPath: /entrypoint.sh
+              subPath: entrypoint.sh
+#      nodeSelector:
+#        failure-domain.beta.kubernetes.io/zone: eu-west-1c
+      volumes:
+        - name: entrypoint
+          configMap:
+            name: visualizer-entrypoint
+

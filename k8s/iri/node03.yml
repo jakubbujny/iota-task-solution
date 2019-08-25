@@ -14,6 +14,8 @@ spec:
       name: iri-peering-udp
     - port: 15600
       name: iri-peering-tcp
+    - port: 5556
+      name: zmq
   clusterIP: None
   selector:
     app: iri-03
@@ -49,7 +51,7 @@ spec:
               mountPath: "/var/run/docker.sock"
         - name: iri
           image: iotaledger/iri:latest
-          args: ["-n", "tcp://iri-02:15600","--testnet", "true", "--remote", "true", "--testnet-coordinator", "9LFYANWKXIKHKYETYBZQPI9SSBZA9KJCOKLMPFUXNWUTULJVOAKHPWVYIVKDCXUYPLFBBHHUFHOESJWNZ", "--testnet-coordinator-security-level", "1", "--testnet-coordinator-signature-mode", "CURLP27", "--mwm", "7", "--milestone-start", "0", "--milestone-keys", "13", "--snapshot", "/snapshot.txt", "--max-depth", "1000"]
+          args: ["-n", "tcp://iri-02:15600", "--zmq-enable-tcp", "true","--testnet", "true", "--remote", "true", "--testnet-coordinator", "9LFYANWKXIKHKYETYBZQPI9SSBZA9KJCOKLMPFUXNWUTULJVOAKHPWVYIVKDCXUYPLFBBHHUFHOESJWNZ", "--testnet-coordinator-security-level", "1", "--testnet-coordinator-signature-mode", "CURLP27", "--mwm", "7", "--milestone-start", "0", "--milestone-keys", "13", "--snapshot", "/snapshot.txt", "--max-depth", "1000"]
           ports:
             - containerPort: 14265
               name: iri-api
@@ -57,6 +59,8 @@ spec:
               name: iri-peering-tcp
             - containerPort: 14600
               name: iri-peering-udp
+            - containerPort: 5556
+              name: zmq
           volumeMounts:
             - name: data
               mountPath: /iri/data
